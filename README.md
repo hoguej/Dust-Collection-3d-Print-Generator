@@ -209,6 +209,7 @@ The toolkit uses a scientifically-derived formula based on real-world testing:
 - `--font-size SIZE`: Text size (default: 5.0)
 - `--text-depth DEPTH`: Text embossing depth (default: 2.0mm)
 - `--timeout SECONDS`: STL generation timeout (default: 120-180s)
+- `-f, --file NAME`: Custom base name (extensions added automatically)
 
 ### Advanced Usage:
 ```bash
@@ -217,6 +218,14 @@ ruby ring_maker.rb -i 50 --t 5 --h 30 --stl
 
 # Quick prototype with minimal text
 ruby ring_maker.rb -o 76 --text-depth 0.5 --stl
+
+# Custom filename (extension added automatically)
+ruby ring_maker.rb -i 30 -f my_custom_ring --stl
+# Creates: output/my_custom_ring.scad and output/my_custom_ring.stl
+
+# Works even if you accidentally add extension
+ruby ring_maker.rb -o 55 -f test.scad
+# Creates: output/test.scad (extension stripped and re-added correctly)
 ```
 
 ## 🧪 Testing Your Setup
@@ -243,6 +252,26 @@ All rings automatically include diameter labels:
 2. **Batch Processing**: Use test kits for multiple rings
 3. **Preview First**: Check `.scad` files in OpenSCAD before generating STL
 4. **Timeout Adjustment**: Increase `--timeout` for complex geometries
+5. **Filename Handling**: Use `-f basename` - extensions are added automatically
+
+## 📁 File Naming Convention
+
+The toolkit automatically handles file extensions:
+
+```bash
+# These all work the same way:
+ruby ring_maker.rb -i 30 -f my_ring
+ruby ring_maker.rb -i 30 -f my_ring.scad  
+ruby ring_maker.rb -i 30 -f my_ring.stl
+
+# All create: output/my_ring.scad (and .stl if --stl flag used)
+```
+
+**Key Points:**
+- Just provide the base name with `-f`
+- Extensions (`.scad`, `.stl`) are added automatically
+- If you accidentally include an extension, it's stripped and re-added correctly
+- Output always goes to `output/` directory unless you specify a path
 
 ## 🔍 Troubleshooting
 
