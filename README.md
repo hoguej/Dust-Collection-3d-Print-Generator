@@ -5,10 +5,19 @@ A comprehensive Ruby-based toolkit for generating 3D printable dust collection a
 ## 🚀 Features
 
 - **Smart Clearance Calculation**: Uses empirical data to calculate optimal clearances based on diameter
+- **Complete Workflow**: From calipers measurement to final adapter in 5 simple steps
 - **Multiple Ring Types**: Single rings, adapter pairs, test fit kits, and tapered adapters
 - **3D Text Integration**: Automatic diameter labeling with curved text on rings
 - **Flexible Output**: Generate OpenSCAD files for editing or STL files ready for 3D printing
 - **Batch Generation**: Create multiple test rings with different clearances simultaneously
+
+## 🔄 Quick Workflow Summary
+
+1. **📏 Measure** → Use calipers to measure your dust port
+2. **🧮 Calculate** → `ruby clearance_calculator.rb 64.2`
+3. **🔧 Create** → `ruby create_rings.rb [recommended command]`  
+4. **🖨️ Test** → 3D print and test all 5 rings
+5. **✨ Adapt** → `ruby create_adapter.rb --o1 [perfect_fit] --o2 [other_side]`
 
 ## 📋 Prerequisites
 
@@ -141,6 +150,41 @@ ruby clearance_calculator.rb           # Show full table
 ruby clearance_calculator.rb 101       # Clearances for 101mm diameter
 ```
 
+## 🎯 Complete Workflow: From Measurement to Adapter
+
+### **Step 1: Measure with Calipers**
+Use digital calipers to measure the **inner or outer diameter** of the part you want to connect to.
+
+### **Step 2: Calculate Optimal Clearances**
+```bash
+# Get recommended test ring commands
+ruby clearance_calculator.rb 64.2
+
+# Output: Shows optimal clearance and ready-to-run create_rings.rb commands
+```
+
+### **Step 3: Create Test Rings**
+```bash
+# Use the recommended command from step 2
+ruby create_rings.rb -o 64.14 --up --step 0.07 --count 5 -f test_64.2mm_outer --stl
+
+# Creates 5 rings: optimal-2steps, optimal-1step, OPTIMAL, optimal+1step, optimal+2steps
+```
+
+### **Step 4: Test the Connection**
+3D print all 5 rings and physically test which one fits best for your connection.
+
+### **Step 5: Create the Final Adapter**
+```bash
+# Once you know the perfect fit, create the final tapered adapter
+# Example: Ring 3 (64.28mm) fit perfectly on side 1, and you need 101mm for side 2
+ruby create_adapter.rb --o1 64.28 --o2 101 --stl
+
+# Output: Creates a tapered adapter connecting the two sizes
+```
+
+---
+
 ## 💡 Quick Start Examples
 
 ### Example 1: Simple Ring
@@ -151,32 +195,26 @@ ruby ring_maker.rb -o 101.6
 # Output: Creates output/ring_od101.6_t2.0_h20.0.scad
 ```
 
-### Example 2: Test Different Fits
+### Example 2: Complete Workflow
 ```bash
-# You measured a table saw port at 64mm inner diameter
-# Create a test kit to find the perfect adapter size
+# Step 1: Measure table saw port → 64.2mm outer diameter
+# Step 2: Get test ring command
+ruby clearance_calculator.rb 64.2
+
+# Step 3: Create test rings (use command from step 2)
+ruby create_rings.rb -o 64.14 --up --step 0.07 --count 5 -f test_64.2mm_outer --stl
+
+# Step 4: Test rings → Ring 3 (64.28mm) fits perfectly
+# Step 5: Create final adapter (connecting to 4" main duct)
+ruby create_adapter.rb --o1 64.28 --o2 101.6 --stl
+```
+
+### Example 3: Quick Test Kit
+```bash
+# Create a test kit with multiple clearances
 ruby make_test_fit_kit.rb -i 64 --stl
 
-# Output: Creates individual STL files for:
-# - Replica of your 64mm port
-# - 4 test adapters with calculated clearances
-```
-
-### Example 3: Connect Two Different Sizes
-```bash
-# Connect 4" main duct to 2.5" tool hose
-ruby create_adapter.rb --o1 101.6 --i2 63.5 --stl
-
-# Output: Creates a tapered adapter STL file
-```
-
-### Example 4: Perfect Fit Adapter
-```bash
-# You have a 101mm outer diameter dust port
-# Create a replica and perfectly fitting adapter
-ruby make_adapter_pair.rb -o 101 --stl
-
-# Output: Creates 2 rings - replica + adapter that slides over it
+# Output: Creates individual STL files with calculated clearances
 ```
 
 ## 📁 Output Files
