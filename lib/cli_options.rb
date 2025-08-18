@@ -19,6 +19,9 @@ class CLIOptions
   # Adapter-specific options
   attr_accessor :inner1, :outer1, :inner2, :outer2
   
+  # Ring series options
+  attr_accessor :step, :count, :direction
+  
   def initialize
     @inner = nil
     @outer = nil
@@ -37,6 +40,11 @@ class CLIOptions
     @outer1 = nil
     @inner2 = nil
     @outer2 = nil
+    
+    # Ring series
+    @step = 0.1
+    @count = 1
+    @direction = :up  # :up or :down
   end
   
   # Validation methods
@@ -79,6 +87,27 @@ class CLIOptions
   
   def primary_diameter
     inner || outer
+  end
+  
+  # Ring series validations
+  def valid_step?
+    step > 0
+  end
+  
+  def valid_count?
+    count > 0
+  end
+  
+  def valid_direction?
+    [:up, :down].include?(direction)
+  end
+  
+  def up_direction?
+    direction == :up
+  end
+  
+  def down_direction?
+    direction == :down
   end
   
   # File handling
@@ -130,6 +159,20 @@ class CLIOptions
     
     unless has_single_adapter_side2?
       raise ArgumentError, "Error: specify exactly one of --i2 or --o2 for side 2"
+    end
+  end
+  
+  def validate_ring_series_options!
+    unless valid_step?
+      raise ArgumentError, "Error: step must be > 0"
+    end
+    
+    unless valid_count?
+      raise ArgumentError, "Error: count must be > 0"
+    end
+    
+    unless valid_direction?
+      raise ArgumentError, "Error: direction must be --up or --down"
     end
   end
   

@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# cli_parser.rb - Standardized CLI parsing for dust collection scripts
+# cli_parser.rb - Base CLI parser for dust collection scripts
 
 require 'optparse'
 require_relative 'cli_options'
@@ -124,82 +124,5 @@ class CLIParser
     parser.on("--stl", "Generate STL file (also creates SCAD file)") { @options.generate_stl = true }
     parser.on("--timeout SECONDS", Integer, "STL generation timeout in seconds (default #{CLIOptions::DEFAULT_TIMEOUT})") { |v| @options.timeout = v }
     parser.on("-f", "--file NAME", String, "Output base name (extension added automatically)") { |v| @options.output_file = v }
-  end
-end
-
-# Specialized parser for adapter scripts
-class AdapterCLIParser < CLIParser
-  def initialize(script_name:, description:, examples: [])
-    super(script_name: script_name, description: description, examples: examples)
-  end
-  
-  def validate!
-    validate_adapter!
-  end
-  
-  private
-  
-  def should_show_help?(argv)
-    argv.empty? && !@options.has_adapter_side1? && !@options.has_adapter_side2? && !@options.help_requested
-  end
-  
-  def add_diameter_options(parser)
-    parser.separator ""
-    parser.separator "Side 1 diameter (specify exactly one):"
-    parser.on("--i1 DIAMETER", Float, "Inner diameter of side 1 in mm") { |v| @options.inner1 = v }
-    parser.on("--o1 DIAMETER", Float, "Outer diameter of side 1 in mm") { |v| @options.outer1 = v }
-    
-    parser.separator ""
-    parser.separator "Side 2 diameter (specify exactly one):"
-    parser.on("--i2 DIAMETER", Float, "Inner diameter of side 2 in mm") { |v| @options.inner2 = v }
-    parser.on("--o2 DIAMETER", Float, "Outer diameter of side 2 in mm") { |v| @options.outer2 = v }
-  end
-  
-  def add_geometry_options(parser)
-    # Adapters don't use standard geometry options - they calculate their own
-  end
-  
-  def add_text_options(parser)
-    # Adapters don't use text options
-  end
-end
-
-# Specialized parser for test kit scripts  
-class TestKitCLIParser < CLIParser
-  def initialize(script_name:, description:, examples: [])
-    super(script_name: script_name, description: description, examples: examples)
-  end
-  
-  private
-  
-  def add_diameter_options(parser)
-    parser.separator ""
-    parser.separator "Diameter options (specify exactly one):"
-    parser.on("-i", "--inner DIAMETER", Float, "Inner diameter in mm (creates rings that fit inside)") { |v| @options.inner = v }
-    parser.on("-o", "--outer DIAMETER", Float, "Outer diameter in mm (creates rings that fit around)") { |v| @options.outer = v }
-  end
-end
-
-# Specialized parser for adapter pair scripts
-class AdapterPairCLIParser < CLIParser
-  def initialize(script_name:, description:, examples: [])
-    super(script_name: script_name, description: description, examples: examples)
-  end
-  
-  private
-  
-  def add_diameter_options(parser)
-    parser.separator ""
-    parser.separator "Diameter options (specify exactly one):"
-    parser.on("-i", "--inner DIAMETER", Float, "Inner diameter in mm (creates adapter that slides inside)") { |v| @options.inner = v }
-    parser.on("-o", "--outer DIAMETER", Float, "Outer diameter in mm (creates adapter that slides over)") { |v| @options.outer = v }
-  end
-  
-  def add_output_options(parser)
-    parser.separator ""
-    parser.separator "Output options:"
-    parser.on("--stl", "Generate STL files (also creates SCAD files)") { @options.generate_stl = true }
-    parser.on("--timeout SECONDS", Integer, "STL generation timeout in seconds (default #{CLIOptions::DEFAULT_TIMEOUT})") { |v| @options.timeout = v }
-    parser.on("-f", "--file NAME", String, "Output base name (directory created automatically)") { |v| @options.output_file = v }
   end
 end
