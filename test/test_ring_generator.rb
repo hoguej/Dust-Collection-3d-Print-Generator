@@ -34,9 +34,17 @@ class TestRingGenerator < Test::Unit::TestCase
     clearance_100 = RingGenerator.calculate_dust_collection_clearance(100.0)
     assert(clearance_50 > clearance_100, "Larger diameters should have smaller clearances")
     
-    # Test rounding to 0.05mm increments
+    # Test rounding to 0.01mm increments (1/100th)
     clearance = RingGenerator.calculate_dust_collection_clearance(75.0)
-    assert_equal(clearance, (clearance * 20).round / 20.0, "Should round to 0.05mm increments")
+    assert_equal(clearance, (clearance * 100).round / 100.0, "Should round to 0.01mm increments")
+    
+    # Test specific precision - should have at most 2 decimal places
+    test_diameters = [45.8, 75.5, 101.0, 125.3]
+    test_diameters.each do |diameter|
+      clearance = RingGenerator.calculate_dust_collection_clearance(diameter)
+      decimal_places = clearance.to_s.split('.')[1]&.length || 0
+      assert(decimal_places <= 2, "Clearance should have at most 2 decimal places: #{clearance} for #{diameter}mm")
+    end
   end
 
   # Test inner diameter calculation
@@ -203,11 +211,11 @@ class TestRingGenerator < Test::Unit::TestCase
       assert(clearance > 0, "Clearance should be positive for diameter #{diameters[i]}: got #{clearance}")
     end
     
-    # Test reasonable bounds (clearances should be between 0.05 and 5.0 mm for typical diameters)
+    # Test reasonable bounds (clearances should be between 0.01 and 5.0 mm for typical diameters)
     typical_diameters = [20, 30, 50, 75, 100, 150]
     typical_diameters.each do |diameter|
       clearance = RingGenerator.calculate_dust_collection_clearance(diameter)
-      assert(clearance >= 0.05 && clearance <= 5.0, 
+      assert(clearance >= 0.01 && clearance <= 5.0, 
         "Clearance should be reasonable for diameter #{diameter}mm: got #{clearance}mm")
     end
   end

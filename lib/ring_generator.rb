@@ -8,8 +8,8 @@ module RingGenerator
   # Formula: clearance = 3476.1064 * diameter^-2.266
   def self.calculate_dust_collection_clearance(diameter_mm)
     clearance = 3476.1064 * (diameter_mm ** -2.266)
-    # Round to reasonable precision (0.05mm increments)
-    (clearance * 20).round / 20.0
+    # Round to nearest 1/100th (0.01mm increments) and format to 2 decimal places
+    sprintf("%.2f", clearance).to_f
   end
   # Generate OpenSCAD script content with curved text
   # Always places text on outer surface for better STL readability

@@ -42,16 +42,39 @@ else
   end
   
   optimal = RingGenerator.calculate_dust_collection_clearance(diameter)
-  tight = optimal * 0.5
-  snug = optimal * 0.75
-  loose = optimal * 1.5
+  
+  # Calculate step size (use optimal/4 to create reasonable steps around optimal)
+  step = sprintf('%.2f', optimal / 4.0).to_f
   
   puts "Clearances for #{diameter}mm diameter dust collection adapter:"
-  puts "  Tight fit:   #{sprintf('%.2f', tight)}mm clearance"
-  puts "  Snug fit:    #{sprintf('%.2f', snug)}mm clearance" 
-  puts "  Optimal fit: #{sprintf('%.2f', optimal)}mm clearance"
-  puts "  Loose fit:   #{sprintf('%.2f', loose)}mm clearance"
+  puts "  Optimal clearance: #{sprintf('%.2f', optimal)}mm"
+  puts "  Step size: #{sprintf('%.2f', step)}mm (optimal ÷ 4)"
+  puts "  Test range: optimal-2steps to optimal+2steps"
   puts
-  puts "For outer adapter: make rings with inner diameters #{diameter + tight}mm, #{diameter + snug}mm, #{diameter + optimal}mm, #{diameter + loose}mm"
-  puts "For inner adapter: make rings with outer diameters #{diameter - tight}mm, #{diameter - snug}mm, #{diameter - optimal}mm, #{diameter - loose}mm"
+  
+  puts "🎯 Recommended create_rings.rb commands:"
+  puts
+  puts "If #{diameter}mm is an OUTER diameter measurement:"
+  # Start at optimal clearance, then step down by 2*step to get the starting point
+  optimal_diameter = diameter + optimal
+  start_diameter = optimal_diameter - (2 * step)
+  puts "  ruby create_rings.rb -o #{sprintf('%.2f', start_diameter)} --up --step #{sprintf('%.2f', step)} --count 5 -f test_#{sprintf('%.1f', diameter)}mm_outer"
+  puts "  Creates 5 rings with outer diameters:"
+  puts "    Ring 1: #{sprintf('%.2f', start_diameter)}mm (optimal-2steps)"
+  puts "    Ring 2: #{sprintf('%.2f', start_diameter + step)}mm (optimal-1step)"
+  puts "    Ring 3: #{sprintf('%.2f', start_diameter + (2*step))}mm (OPTIMAL)"
+  puts "    Ring 4: #{sprintf('%.2f', start_diameter + (3*step))}mm (optimal+1step)"
+  puts "    Ring 5: #{sprintf('%.2f', start_diameter + (4*step))}mm (optimal+2steps)"
+  puts
+  puts "If #{diameter}mm is an INNER diameter measurement:"
+  # Start at optimal clearance, then step up by 2*step to get the starting point  
+  optimal_diameter = diameter - optimal
+  start_diameter = optimal_diameter + (2 * step)
+  puts "  ruby create_rings.rb -i #{sprintf('%.2f', start_diameter)} --down --step #{sprintf('%.2f', step)} --count 5 -f test_#{sprintf('%.1f', diameter)}mm_inner"
+  puts "  Creates 5 rings with inner diameters:"
+  puts "    Ring 1: #{sprintf('%.2f', start_diameter)}mm (optimal-2steps)"
+  puts "    Ring 2: #{sprintf('%.2f', start_diameter - step)}mm (optimal-1step)"
+  puts "    Ring 3: #{sprintf('%.2f', start_diameter - (2*step))}mm (OPTIMAL)"
+  puts "    Ring 4: #{sprintf('%.2f', start_diameter - (3*step))}mm (optimal+1step)"
+  puts "    Ring 5: #{sprintf('%.2f', start_diameter - (4*step))}mm (optimal+2steps)"
 end
